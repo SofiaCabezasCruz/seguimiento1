@@ -88,7 +88,7 @@ gunzip Lates_calcarifer.ASB_HGAPassembly_v1.114.gff3.gz
 Se usó el comando _gunzip_ para descomprimir el archivo.
 
 
-# 3) Análisis del archivo
+## 3) Análisis del archivo
 
 ### **a) Proporcione una breve descripción del organismo asignado en el archivo README.**
 
