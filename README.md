@@ -53,7 +53,7 @@ Es una lista de pares (tag=valor) separados por un punto y coma, que nos van a d
 * **Target:** Indica el objetivo de una alineación.
 * **Derives_from:** Relación temporal o de derivación (genes policistronicos).
 * **Note:** Nota de texto cualquiera.
-* Dbxref: Referencia cruzada a una base de datos externa.
+* **Dbxref:** Referencia cruzada a una base de datos externa.
 * **Ontology_term:** Referencia a un termino de ontología.
 * **Is_circular:** Indica si la secuencia es circular.
 
