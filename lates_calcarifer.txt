@@ -1,0 +1,86 @@
+#1) Descripcion del archivo
+#a) Describa los campos que se encontrara en este tipo de archivos. Que informacion esta alli contenida? Proporcione ejemplos.
+#
+#Columna 1 (sequid)
+#Es basicamente el id de la secuencia principal (cromosoma, contig, scaffold, etc.) que nos dice pues el sistema de coordenadas para la caracteristica actual. Estos no pueden contener caracteres raros ni espacios.
+#La informacion que tiene es la referencia de la secuencia en donde esta la caracteristica. Ej: chr1
+#Columna 2 (source)
+#Es el nombre de la fuente de donde se genero la caracteristica, o sea que puede ser de un software o una base de datos de nombre x. El proposito del source es extender la ontologia de caracteristicas añadiendo un calificador al type. 
+#Ej: Ensembl
+#Columna 3 (type)
+#Es el tipo de caracteristica biologica, este tiene que ser un termino del "Sequence Ontology" (SO).
+#Ej: gene, exon, CDS, mRNA
+#Columna 4 y 5 (start end)
+#Son las coordenadas de inicio a fin de la caracteristica en la secuencia, numerada desde 1 (la posicion de inicio siempre tiene que ser menor o igual que la del final). O sea La ubicación geográfica precisa (posiciones en el ADN/ARN) de la característica dentro de la sequid.
+#Ej: 1000, 5000
+#Columna 6 (score)
+#Es la puntuacion de confianza de la caracteristica que esta representada por un valor numerico. Para caracteristicas de similitud de secuencia se usa valores-e y valores-p para caracteristicas de prediccion de genes ab initio, y si no hay una puntuacion que aplique solo se pone un punto.
+#Ej: 0.95
+#Columna 7 (strand)
+#Nos dice la hebra o la cadena de a secuencia en donde se encuentra la caracteristica. Puede ser: "+" hebra positiva; "-" hebra inversa; "." caracteristica indeterminada; "?" hebra relevante pero desconocida.
+#Ej: +, -, ., ?
+#Columna 8 (phase)
+#Esta solo se usa para caracteristicas del tipo CDS, y nos indica en donde comienza el siguiente codon en relacion con el extremo 5' del CDS actual. Puede ser: "0" el codon empieza en el primer nucleotido; "1" el codon empieza en el 2ndo nucleotido; "2" el codon empieza en el 3er nucleotido; para todas las demas se usa el punto.
+#Ej: 0, 1, 2
+#Columna 9 (attributes)
+#Es una lista de pares (tag=valor) separados por un punto y coma, que nos van a dar info adicional de la caracteristica, lo cual es muy flexible para metadatos adicionales, y algunos tags tienen significados predefinidos:
+#* ID: Identificador de la caracteristica (para caracteristicas que son padre de otras).
+#* Name: Nombre para el usuario.
+#* Alias: Nombre secundario.
+#* Parent: Uno o más IDs de caracteristicas padre a las que pertenece esta caracteristica, deja que haya jerarquia (un ARNm tiene un gen como padre).
+#* Target: Indica el objetivo de una alineacion.
+#* Derives_from: Relacion temporal o de derivacion (genes policistronicos).
+#* Note: Nota de texto cualquiera
+#* Dbxref: Referencia cruzada a una base de datos externa.
+#* Ontology_term: Referencia a un termino de ontologia.
+#* Is_circular: Indica si la secuencia es circular.
+#Ej: ID=gene001;Name=BRCA1;biotype=protein_coding;Note=Human gene for breast cancer susceptibility
+#Ejemplo General
+#ctg123 . CDS             7000  7600  .  +  0  ID=cds00001;Parent=mRNA00001;Name=edenprotein.1
+
+
+#2) Descarga de archivos de trabajo
+#a) Descarga del archivo por medio de la consola
+zofix2@SOFIA-CABEZAS ~/seguimiento1
+$ wget http://ftp.ensembl.org/pub/current_gff3/lates_calcarifer/Lates_calcarifer.ASB_HGAPassembly_v1.114.gff3.gz
+#Se uso el comando wget para poder descargar lo que esta en el siguiente link de ensembl (que basicamente es el path que lo ayuda a encontrar el archivo), que en mi caso es de la especie lates calcarifer.
+#b) Descomprima el archivo usando la linea de comandos
+zofix2@SOFIA-CABEZAS ~/seguimiento1
+$ gunzip Lates_calcarifer.ASB_HGAPassembly_v1.114.gff3.gz 
+#Con el comando gunzip este ayuda a la consola descromprimir el archivo .gff
+ 
+#3) Analisis del archivo
+#b) Investigue, usando las herramientas de la linea de comandos Unix, y conteste las siguientes preguntas
+#i. Cuantos features contiene el archivo?
+zofix2@SOFIA-CABEZfiltro para que no me mostrara cualquier cosa que empezara por #, ya que en el primer intento, el top en el puesto 6 me aparecía: 30568 ###. Ya después se corta solo para usar la columna 3 con el comando _cut -f 3_, con el comando _sort_ me ayuda a agrupar y ordenar los tipos, el _uniq -c_ ayuda a que no me aparezcan los tipos duplicados y además me ayuda a contar el tipo, ya con el _sort -rn_ ayuda a ordenar el tipo y hacerlo del mayor al menor, y por ultimo el _head -n 10_ me muestra las 10 primeras líneas que pues serían el top 10 que necesitamos.AS ~/seguimiento1
+$ cat Lates_calcarifer.ASB_HGAPassembly_v1.114.gff3 | grep -v "^#" Lates_calcarifer.ASB_HGAPassembly_v1.114.gff3 | wc -l
+1728776
+#Aqui se usa el comando _grep -v_ para filtrar todo lo que no empieza por # (que normalmente en un archivo .gff es un titulo o comentario, lo cual no nos sirve para saber cuantos features hay), y ya el _wc -l_ cuenta las lineas que si nos importan. En el archivo hay 1728776 features.
+# ii. Cuantas regiones de la secuencia (cromosomas) contiene el archivo?
+zofix2@SOFIA-CABEZAS ~/seguimiento1
+$ cat Lates_calcarifer.ASB_HGAPassembly_v1.114.gff3 | grep "^##sequence-regi
+on" Lates_calcarifer.ASB_HGAPassembly_v1.114.gff3 | wc -l
+3807
+#Aqui tambien usamos _grep_, solo que ahora filtramos los que inician con ##sequence-region que normalmente estan acompanados de un cromosoma en especifico al lado, y ya con el _wc -l_ se cuentan las lineas. Hay 3807 regiones de la secuencia en el archivo.
+# iii. Cuantos genes estan listados en el organismo?
+zofix2@SOFIA-CABEZAS ~/seguimiento1
+$ cat Lates_calcarifer.ASB_HGAPassembly_v1.114.gff3 | cut -f 3 | grep -i "^g
+ene$" | wc -l
+25109
+#Aqui entonces los que hice fue, ya que en las especificaciones de un archivo .gff la columna 3 tiene el "type" (que puede ser un exon, CDS, gen, etc.) corte la columna 3 con el comando _cut -f 3_ para que el _grep_ solo coja y filtre la info de alli, que en este caso seria la palabra "gene" y ya por ultimo use el comando _wc -l_ para que ya me cuente las lineas y me de el resultado. Hay 25109 genes listados del lates calcarifer.
+# iv. Cual es el top 10 de tipo de features (columna 3) mas anotados en el genoma?
+zofix2@SOFIA-CABEZAS ~/seguimiento1
+$ cat Lates_calcarifer.ASB_HGAPassembly_v1.114.gff3 | grep -v "^#" | cut -f
+3 | sort | uniq -c | sort -rn | head -n 10
+ 787631 exon
+ 761857 CDS
+  58165 mRNA
+  44499 five_prime_UTR
+  33044 three_prime_UTR
+  25109 gene
+  11309 biological_region
+   3807 region
+   1306 ncRNA_gene
+    455 snRNA
+#Aqui entonces, de primeras me toco poner un filtro para que no me mostrara cualquier cosa que empezara por #, ya que en el primer intento, el top en el puesto 6 me aparecia: 30568 ###. Ya despues se corta solo para usar la columna 3 con el comando _cut -f 3_, con el comando _sort_ me ayuda a agrupar y ordenar los tipos, el _uniq -c_ ayuda a que no me aparezcan los tipos duplicados y ademas me ayuda a contar el tipo, ya con el _sort -rn_ ayuda a ordenar el tipo y hacerlo del mayor al menor, y por ultimo el _head -n 10_ me muestra las 10 primeras lineas que pues serian el top 10 que necesitamos.
+
